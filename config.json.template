@@ -1,0 +1,8 @@
+{
+    "logformat": [
+        {"Field1": "String"},
+        {"Field2": "String"},
+        {"Field3": "String"},
+        {"Field4": "String"}
+    ]
+}
