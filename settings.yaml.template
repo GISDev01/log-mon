@@ -1,0 +1,4 @@
+{
+    'FieldNamesList' : ['Field1', 'Field2', 'Field3'],
+    'PathToCSV' : '\tmp\log1.log'
+}
