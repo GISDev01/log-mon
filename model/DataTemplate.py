@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 SQLAlchBaseClass = declarative_base()
 
+
 class LogRecord(SQLAlchBaseClass):
     logger.debug('Creating Log Record Class for SQL Alch')
     __tablename__ = 'logstemplate'
@@ -27,3 +28,19 @@ class LogRecord(SQLAlchBaseClass):
     Group3Name = Column(String)
     Group4Name = Column(String)
     GroupType = Column(String)
+
+    def __init__(self, line):
+        self.Group = line[0]
+        self.Num = line[1].lstrip()
+        self.Tone = line[2].lstrip()
+        self.Type2 = int(line[3].lstrip())
+        self.IDTest = line[4].lstrip()
+        self.Type4 = line[5].lstrip()
+        self.NumLogs = int(line[6].lstrip())
+        self.TimeUp = line[7].lstrip()
+        self.StartDateTime = line[8].lstrip()
+        self.Group1Name = line[9].split(' - ')[0].lstrip()
+        self.Group2Name = line[9].split(' - ')[1].lstrip()
+        self.Group3Name = str(line[9].split(' - ')[2:]).lstrip()
+        self.Group4Name = line[10].lstrip()
+        self.GroupType = line[11].lstrip()
