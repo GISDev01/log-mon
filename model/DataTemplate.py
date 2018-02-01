@@ -2,17 +2,22 @@ import logging
 
 from sqlalchemy import Column, String, Integer, Time, Float
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
 
 LOG_FORMAT = '%(asctime)-15s %(levelname)s: %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
+db_conn_string = 'postgres://postgres:postgres@localhost:5432/logs'
+db_engine = create_engine(db_conn_string)
 SQLAlchBaseClass = declarative_base()
 
 
 class LogRecord(SQLAlchBaseClass):
     logger.debug('Creating Log Record Class for SQL Alch')
+
     __tablename__ = 'logstemplate'
+
     id = Column(Integer, primary_key=True)
     Group = Column(String)
     Num = Column(Float)
@@ -44,3 +49,5 @@ class LogRecord(SQLAlchBaseClass):
         self.Group3Name = str(line[9].split(' - ')[2:]).lstrip()
         self.Group4Name = line[10].lstrip()
         self.GroupType = line[11].lstrip()
+
+SQLAlchBaseClass.metadata.create_all(db_engine)
