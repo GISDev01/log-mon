@@ -38,6 +38,8 @@ class LogRecord(SQLAlchBaseClass):
     GroupType = Column(String)
 
     def __init__(self, line):
+        if len(line) < 12:
+            logger.exception("CSV line doesn't contain enough fields.")
         self.Group = line[0]
         self.Num = line[1].lstrip()
         self.Tone = line[2].lstrip()
