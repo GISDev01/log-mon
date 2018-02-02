@@ -1,3 +1,6 @@
+# Run this script stand-alone to create a new postgres table with a matching schema to
+# the user-defined classes (eg. LogRecord)
+
 import logging
 
 from sqlalchemy import Column, String, Integer, Time, Float
@@ -16,7 +19,7 @@ SQLAlchBaseClass = declarative_base()
 class LogRecord(SQLAlchBaseClass):
     logger.debug('Creating Log Record Class for SQL Alch')
 
-    __tablename__ = 'logstemplate'
+    __tablename__ = 'log-mon-table'
 
     id = Column(Integer, primary_key=True)
     Group = Column(String)
@@ -49,5 +52,6 @@ class LogRecord(SQLAlchBaseClass):
         self.Group3Name = str(line[9].split(' - ')[2:]).lstrip()
         self.Group4Name = line[10].lstrip()
         self.GroupType = line[11].lstrip()
+
 
 SQLAlchBaseClass.metadata.create_all(db_engine)
