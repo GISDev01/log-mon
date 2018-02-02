@@ -1,39 +1,60 @@
 import logging
 import os
 import json
+import csv
 
 from sqlalchemy import create_engine
-from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+gitrepo = False
+try:
+    from model import LogRecord
+except:
+    from model import DataTemplate
+
+    gitrepo = True
 
 LOG_FORMAT = '%(asctime)-15s %(levelname)s: %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
-# db_conn_string = 'postgres://username:pwd@localhost:5432/dbname'
+CONFIG_FILEPATH = 'config.json'
+CSV_FILEPATH = os.path.join('data', 'testdata.log')
+NUM_HEADER_LINES_TO_SKIP = 3
+
+# TEMPLATE: db_conn_string = 'postgres://username:pwd@localhost:5432/dbname'
 db_conn_string = 'postgres://postgres:postgres@localhost:5432/logs'
 
 db_engine = create_engine(db_conn_string)
-sql_alch_base = declarative_base()
-
+SQLAlchBaseClass = declarative_base()
+Session = sessionmaker(bind=db_engine)
+session = Session()
 
 def get_config_options(config_filepath):
-    print('Load config')
-    with open('config.json') as json_data_file:
+    logger.debug('Loading Config file from: {}'.format(config_filepath))
+    with open(config_filepath) as json_data_file:
         data = json.load(json_data_file)
-    print('Create: {}'.format(data))
+    logger.info('Config data: {}'.format(data))
     return data
 
 
-class LogRecord(sql_alch_base):
-    print('Create SQL Alchemy class for records')
-    field_config = get_config_options('')
+sql_session = sessionmaker(bind=db_engine)
+SQLAlchBaseClass.metadata.create_all(db_engine)
 
-    __tablename__ = 'logs1'
-    for field_mapping in field_config.items():
-        print(field_mapping)
-    field1 = Column(String, primary_key=True)
-    field2 = Column(String)
-    field3 = Column(String)
-    field4 = Column(String)
+with open(CSV_FILEPATH, 'r') as csvfile:
+    csv_reader = csv.reader(csvfile, delimiter=",")
+    skipped_lines = 0
+    while skipped_lines < NUM_HEADER_LINES_TO_SKIP:
+        skipped_lines += 1
+        next(csv_reader)
+    # Create a new object from every line in the CSV, using the rules defined within the class's init method
+    records_to_insert = [LogRecord.LogRecord(line) for _, line in enumerate(csv_reader)]
+
+# Create the table in postgres using the Class definition if it's not created already
+SQLAlchBaseClass.metadata.create_all(db_engine)
+
+# for record in records_to_insert:
+#     logger.info(record.StartDateTime)
+# session.add_all(records_to_insert)
+# session.commit()
